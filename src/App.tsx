@@ -11,10 +11,11 @@ class App extends React.Component<{}, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
-
+      internalDrag: false
     };
     this.setBookmarkState();
     this.rerenderParentCallback = this.rerenderParentCallback.bind(this);
+    this.setInternalDrag = this.setInternalDrag.bind(this);
   }
 
   rerenderParentCallback() {
@@ -25,8 +26,20 @@ class App extends React.Component<{}, AppState> {
     if (this.state.bookmarkBarNode && this.state.otherBookmarksNode) {
       return (
         <div className="App">
-          <Folder forceUpdateCallback={this.rerenderParentCallback} index={[0]} updateTree={this.updateBookmarkBarTree} treeNode={this.state.bookmarkBarNode[0]}></Folder>
-            <Folder forceUpdateCallback={this.rerenderParentCallback} index={[0]} updateTree={this.updateOtherBookmarksTree} treeNode={this.state.otherBookmarksNode[0]}></Folder>
+          <Folder 
+            index={[0]}
+            forceUpdateCallback={this.rerenderParentCallback}
+            updateTree={this.updateBookmarkBarTree}
+            setInternalDrag={this.setInternalDrag}
+            internalDrag={this.state.internalDrag}
+            treeNode={this.state.bookmarkBarNode[0]}></Folder>
+          <Folder 
+            index={[0]}
+            forceUpdateCallback={this.rerenderParentCallback}
+            updateTree={this.updateOtherBookmarksTree}
+            setInternalDrag={this.setInternalDrag}
+            internalDrag={this.state.internalDrag}
+            treeNode={this.state.otherBookmarksNode[0]}></Folder>
 
         </div>
       );
@@ -39,9 +52,9 @@ class App extends React.Component<{}, AppState> {
       let temp = [...this.state.bookmarkBarNode];
       const _indices = [...indices];
       const firstIndex = _indices.pop();
-      if (firstIndex!==undefined) {
+      if (firstIndex !== undefined) {
         const arr = _indices.reduce((a, i) => a[i].children as any, temp);
-        if(arr[firstIndex]){
+        if (arr[firstIndex]) {
           arr[firstIndex].children = currentList;
         }
         this.setState({ bookmarkBarNode: temp });
@@ -54,14 +67,18 @@ class App extends React.Component<{}, AppState> {
       let temp = [...this.state.otherBookmarksNode];
       const _indices = [...indices];
       const firstIndex = _indices.pop();
-      if (firstIndex!==undefined) {
+      if (firstIndex !== undefined) {
         const arr = _indices.reduce((a, i) => a[i].children as any, temp);
-        if(arr[firstIndex]){
+        if (arr[firstIndex]) {
           arr[firstIndex].children = currentList;
         }
         this.setState({ otherBookmarksNode: temp });
       }
     }
+  }
+  //inform the app that a drag is happening from within the bookmark bar, so no duplicate links are created on drop
+  setInternalDrag(value: boolean) {
+    this.setState({ internalDrag: value });
   }
 
   setBookmarkState() {

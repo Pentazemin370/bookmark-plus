@@ -4,7 +4,11 @@
 .btn {
     padding:0px;
 }
-
+.bookmark-link {
+    max-width:300px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
 .icon-button-container {
     border-radius: 4px;
     &:hover{
