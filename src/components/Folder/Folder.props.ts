@@ -1,8 +1,7 @@
-export interface FolderProps {
-    treeNode : chrome.bookmarks.BookmarkTreeNode;
-    internalDrag : boolean;
+import { NodeEntityProps } from "../NodeEntity/NodeEntity.props";
+
+export interface FolderProps extends NodeEntityProps {
     updateTree : (...args : any) => void;
-    forceUpdateCallback : (...args : any) => void;
-    setInternalDrag : (value : boolean) => void;
+    setCanDrop : (value : boolean) => void;
     index : number[];
 }

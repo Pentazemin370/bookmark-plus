@@ -1,7 +1,6 @@
-export interface FolderState {
+import { NodeEntityState } from "../NodeEntity/NodeEntity.state";
+
+export interface FolderState extends NodeEntityState {
     expanded : boolean;
-    allowDrop : boolean;
-    newNode : string | null;
-    newIndex : number | null;
     list : chrome.bookmarks.BookmarkTreeNode[] | undefined;
 }

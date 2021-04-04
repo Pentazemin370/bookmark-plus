@@ -3,6 +3,8 @@ import './App.scss';
 import Folder from './components/Folder/Folder';
 import { AppState } from './AppState';
 import 'bootstrap/dist/js/bootstrap.min';
+import { ContextMenu } from './components/ContextMenu/ContextMenu';
+import { SearchMenu } from './components/SearchMenu/SearchMenu';
 
 const BOOKMARKS_BAR_ID = "1";
 const OTHER_BOOKMARKS_ID = "2";
@@ -11,11 +13,12 @@ class App extends React.Component<{}, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      internalDrag: false
+      canDrop: false,
+      contextMenu: { open: false, menuOptions: [] }
     };
     this.setBookmarkState();
     this.rerenderParentCallback = this.rerenderParentCallback.bind(this);
-    this.setInternalDrag = this.setInternalDrag.bind(this);
+    this.setCanDrop = this.setCanDrop.bind(this);
   }
 
   rerenderParentCallback() {
@@ -26,21 +29,33 @@ class App extends React.Component<{}, AppState> {
     if (this.state.bookmarkBarNode && this.state.otherBookmarksNode) {
       return (
         <div className="App">
-          <Folder 
+          <ContextMenu menuOpen={this.state.contextMenu.open}
+            setContextMenu={this.setContextMenu}>
+            {this.state.contextMenu.menuOptions}
+          </ContextMenu>
+          <Folder
             index={[0]}
             forceUpdateCallback={this.rerenderParentCallback}
             updateTree={this.updateBookmarkBarTree}
-            setInternalDrag={this.setInternalDrag}
-            internalDrag={this.state.internalDrag}
-            treeNode={this.state.bookmarkBarNode[0]}></Folder>
-          <Folder 
+            setCanDrop={this.setCanDrop}
+            setContextMenu={this.setContextMenu}
+            canDrop={this.state.canDrop}
+            treeNode={this.state.bookmarkBarNode[0]}>
+          </Folder>
+          <Folder
             index={[0]}
             forceUpdateCallback={this.rerenderParentCallback}
             updateTree={this.updateOtherBookmarksTree}
-            setInternalDrag={this.setInternalDrag}
-            internalDrag={this.state.internalDrag}
-            treeNode={this.state.otherBookmarksNode[0]}></Folder>
-
+            setCanDrop={this.setCanDrop}
+            setContextMenu={this.setContextMenu}
+            canDrop={this.state.canDrop}
+            treeNode={this.state.otherBookmarksNode[0]}>
+          </Folder>
+          <SearchMenu
+            forceUpdateCallback={this.rerenderParentCallback}
+            setContextMenu={this.setContextMenu}
+            canDrop={true}>
+          </SearchMenu>
         </div>
       );
     }
@@ -77,8 +92,8 @@ class App extends React.Component<{}, AppState> {
     }
   }
   //inform the app that a drag is happening from within the bookmark bar, so no duplicate links are created on drop
-  setInternalDrag(value: boolean) {
-    this.setState({ internalDrag: value });
+  setCanDrop(value: boolean) {
+    this.setState({ canDrop: value });
   }
 
   setBookmarkState() {
@@ -89,6 +104,12 @@ class App extends React.Component<{}, AppState> {
       this.setState({ otherBookmarksNode: node });
     });
   }
+
+  setContextMenu = (open: boolean, menuOptions?: JSX.Element[]) => {
+    this.setState({
+      contextMenu: { open: open, menuOptions: menuOptions ? menuOptions : this.state.contextMenu.menuOptions }
+    });
+  };
 
 }
 

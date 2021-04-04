@@ -1,0 +1,15 @@
+.menu-container {
+    position:absolute;
+    background-color:white;
+    min-width:100px;
+    padding:3px;
+    border:2px solid black;
+    z-index:100;
+    cursor:pointer;
+}
+
+.menu-option-container {
+    &:hover {
+        background-color:rgba(71, 163, 238, 0.6);
+    }
+}

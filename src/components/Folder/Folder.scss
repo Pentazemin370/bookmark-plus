@@ -2,34 +2,35 @@
     padding: 0rem;
 }
 .btn {
-    padding:0px;
+    padding: 0px;
 }
-.bookmark-link {
-    max-width:300px;
-    overflow: hidden;
-    text-overflow:ellipsis;
-}
-.icon-button-container {
-    border-radius: 4px;
-    &:hover{
-        cursor:pointer;
-        background-color:rgba(0,0,0,0.1);
-    }
-}
+
+// .icon-button-container {
+//     border-radius: 4px;
+//     &:hover {
+//         cursor: pointer;
+//         background-color: rgba(0, 0, 0, 0.1);
+//     }
+// }
 
 .placeholder {
-    position:relative;
-    margin-bottom:-30px;
-    z-index:1;
-    height:30px;
+    position: relative;
+    margin-bottom: -30px;
+    z-index: 1;
+    height: 30px;
     &:last-child {
-        margin-bottom:0px;
+        margin-bottom: 0px;
     }
     &.active {
-        height:50px;
-        margin-bottom:0px;
+        height: 50px;
+        margin-bottom: 0px;
         border: 2px dashed gray;
-        
     }
+}
 
+.drag {
+    background-color:teal;
+    opacity:1;
+    width:100%;
+    cursor: grabbing;
 }

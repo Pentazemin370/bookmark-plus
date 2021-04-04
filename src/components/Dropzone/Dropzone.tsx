@@ -26,3 +26,5 @@ export class Dropzone extends React.Component<DropzoneProps,DropzoneState> {
     ></div>);
     }
 }
+
+export default Dropzone;

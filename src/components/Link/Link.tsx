@@ -1,59 +1,42 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Card } from "react-bootstrap";
-import { Dropzone } from "../Dropzone/Dropzone";
+import Dropzone from "../Dropzone/Dropzone";
+import NodeEntity from "../NodeEntity/NodeEntity";
 import { LinkProps } from "./Link.props";
 import { LinkState } from "./Link.state";
+import './Link.scss';
 
-export class Link extends React.Component<LinkProps, LinkState> {
+export class Link extends NodeEntity<LinkProps, LinkState> {
 
     constructor(props: LinkProps) {
         super(props);
         this.state = {
-            expanded: false,
-            refresh: false,
-            newNode: null,
-            newIndex: null,
             list: this.props.treeNode.children
         }
     }
 
+    deleteLink = () => { chrome.bookmarks.remove(this.props.treeNode.id,()=>{this.props.forceUpdateCallback()}); };
+
+    linkContextMenu = [
+        <div>Edit</div>,
+        <div onClick={this.deleteLink}>Delete</div>
+    ];
     render() {
-        return <Card data-nodeId={this.props.treeNode.id} key={this.props.treeNode.id}>
-            <Dropzone onDropCallback={this.addLink} canDrop={!this.props.internalDrag}></Dropzone>
-            <Card.Header className="p-0 bg-light">
-                <div className="p-3 w-100 d-flex bg-white align-items-center justify-content-between">
-                    <a href="#" onClick={() => { this.followLink(); }}>
+        return <div
+            onContextMenu={() => { this.props.setContextMenu(true, this.linkContextMenu); }}
+            className="bookmark-link-container" data-nodeId={this.props.treeNode.id} key={this.props.treeNode.id}>
+            <Dropzone onDropCallback={this.addLink} canDrop={this.props.canDrop}></Dropzone>
+ 
+                <div className="p-2 w-100 d-flex bg-white align-items-center" >
+                    <div className="px-2 icon-button-container" >
+                        <img src={`chrome://favicon/${this.props.treeNode.url}`} />
+                    </div>
+                    <a contentEditable="true" className="bookmark-link" onClick={() => this.followLink()}>
                         {this.props.treeNode.title} {this.props.treeNode.id}
                     </a>
-                    <div className="px-2 icon-button-container">
-                        <FontAwesomeIcon className="text-secondary" icon={faTrash}></FontAwesomeIcon>
-                    </div>
                 </div>
-            </Card.Header>
-        </Card>
+        </div>
     }
-
-    followLink() {
-        if (this.props.treeNode.url) {
-            window.top.location.href = this.props.treeNode.url;
-        }
-    }
-
-    addLink = (event : React.DragEvent) =>{
-        event.preventDefault();
-        event.stopPropagation();
-        const url = event.dataTransfer.getData('URL');
-        if (url) {
-          chrome.bookmarks.create({
-            url: url,
-            title: url,
-            parentId: this.props.treeNode.parentId,
-            index: this.props.treeNode.index
-          }, (node) => { this.props.forceUpdateCallback(node) });
-        }
-        event.dataTransfer.clearData();
-      }
 
 }
+export default Link;

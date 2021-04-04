@@ -3,5 +3,6 @@
 export interface AppState {
   bookmarkBarNode? : chrome.bookmarks.BookmarkTreeNode[];
   otherBookmarksNode? : chrome.bookmarks.BookmarkTreeNode[];
-  internalDrag : boolean;
+  canDrop : boolean;
+  contextMenu :  { open : boolean, menuOptions : JSX.Element[] }
 }

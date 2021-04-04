@@ -25,6 +25,6 @@
     "persistent":false
   },
   "permissions": [
-    "bookmarks","tabs"
+    "bookmarks","tabs","chrome://favicon/"
   ]
 }
