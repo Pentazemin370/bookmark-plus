@@ -19,12 +19,6 @@ export class NodeEntity<P extends NodeEntityProps,S extends NodeEntityState> ext
         }
         event.dataTransfer.clearData();
       }
-
-    protected followLink() {
-        if (this.props.treeNode.url) {
-            window.top.location.href = this.props.treeNode.url;
-        }
-    }
     
 }
 export default NodeEntity;

@@ -1,5 +1,6 @@
 export interface ContextMenuProps {
     menuOpen : boolean;
+    y : number;
     children: React.ReactElement[];
-    setContextMenu : (menuOpen : boolean, menuOptions?: JSX.Element[]) => void;
+    setContextMenu : (menuOpen : boolean, y? : number, menuOptions?: JSX.Element[]) => void;
 }

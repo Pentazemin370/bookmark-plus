@@ -29,8 +29,11 @@
 }
 
 .drag {
-    background-color:teal;
     opacity:1;
     width:100%;
     cursor: grabbing;
+}
+
+.chosen {
+    background-color:aqua;
 }

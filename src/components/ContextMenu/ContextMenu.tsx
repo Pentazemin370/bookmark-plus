@@ -17,14 +17,13 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
 
     openMenu = (e: MouseEvent) => {
         e.preventDefault();
-        this.setState({ xPos: `${e.pageX}px`, yPos: `${e.pageY}px` });
     }
 
     render() {
         if (this.props.menuOpen) {
-            return <div className="menu-container" style={{ top: this.state.yPos, left: this.state.xPos }}>
-                {this.props.children.map(node=><div className="menu-option-container">{node}</div>)}
-                <div className="menu-option-container" onClick={this.closeMenu}>Cancel</div>
+            return <div className="menu-container w-100" style={{ top: `${this.props.y}px`, left: 0 }}>
+                {this.props.children}
+                    <button onClick={this.closeMenu} className="btn btn-outline-primary p-0 border-0 rounded-0 text-left">Cancel</button>
             </div>;
         }
         return null;
