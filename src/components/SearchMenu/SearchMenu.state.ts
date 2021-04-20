@@ -1,4 +1,6 @@
 export interface SearchMenuState {
-    value : string;
-    resultList : chrome.bookmarks.BookmarkTreeNode[];
+    value: string;
+    includeHistory: boolean;
+    page: number;
+    resultList: (chrome.bookmarks.BookmarkTreeNode | chrome.history.HistoryItem)[];
 }

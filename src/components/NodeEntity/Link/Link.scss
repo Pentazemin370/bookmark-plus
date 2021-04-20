@@ -1,0 +1,12 @@
+.bookmark-link {
+    min-width: 300px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 20px;
+}
+
+.bookmark-link-container {
+    cursor: pointer;
+}

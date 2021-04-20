@@ -1,14 +1,14 @@
 .dropzone {
     position:relative;
-    margin-bottom:-30px;
+    margin-bottom:-40px;
     z-index:1;
-    height:30px;
+    height:40px;
     &:last-child {
         margin-bottom:0px;
     }
     &.active {
-        height:50px;
         margin-bottom:0px;
+        background-color:white;
         border: 2px dashed gray;
     }
 }

@@ -1,0 +1,48 @@
+{
+  "manifest_version": 2,
+  "name": "BookmarkPlus",
+  "description": "Take your bookmarks to the next level, and never forget anything you learned!",
+  "version": "0.0.1",
+  "browser_action": {
+    "default_icon": "logo192.png"
+  },
+  "commands": {
+    "toggle-menu": {
+      "suggested_key": {
+        "default": "Ctrl+Space",
+        "mac": "Ctrl+Space"
+      },
+      "description": "Toggle Command"
+    }
+  },
+  "icons": {
+    "16": "logo192.png",
+    "48": "logo192.png",
+    "128": "logo192.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "match_about_blank": true
+    }
+  ],
+  "background": {
+    "scripts": [
+      "sw.js"
+    ],
+    "persistent": false
+  },
+  "web_accessible_resources": [
+    "index.html"
+  ],
+  "permissions": [
+    "bookmarks",
+    "tabs",
+    "chrome://favicon/"
+  ]
+}

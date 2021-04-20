@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import './Folder.scss';
 import { faFolder } from "@fortawesome/free-regular-svg-icons";
 import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
@@ -6,12 +6,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FolderProps } from './Folder.props';
 import { FolderState } from './Folder.state';
 import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { ReactSortable, Sortable } from 'react-sortablejs';
 import { Link } from '../Link/Link';
-import Dropzone from '../Dropzone/Dropzone';
-import NodeEntity from '../NodeEntity/NodeEntity';
+import NodeEntity from '../NodeEntity';
+import { CreateService } from '../../../services/CreateService';
+import Dropzone from '../../Dropzone/Dropzone';
+
 
 
 class Folder extends NodeEntity<FolderProps, FolderState> {
@@ -20,14 +21,28 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
     super(props);
     this.state = {
       expanded: false,
-      editable: false,
-      list: this.props.treeNode.children
+      editable: false
     }
   }
 
   isRootFolder = this.props.treeNode.id === "1" || this.props.treeNode.id === "2";
 
   contentRef!: HTMLElement;
+
+  addChildLink = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const url = event.dataTransfer.getData('URL');
+    if (url) {
+      chrome.bookmarks.create({
+        url: url,
+        title: url,
+        parentId: this.props.treeNode.id,
+        index: 0
+      }, (node) => { this.props.forceUpdateCallback(node) });
+    }
+    event.dataTransfer.clearData();
+  }
 
   editText = () => {
     this.setState({ editable: true });
@@ -50,7 +65,7 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
     this.setState({ editable: false });
   }
 
-  sortFolder = () => {
+  sortFolderByTitle = () => {
     this.props.treeNode.children?.sort((a, b) => {
       const titleA = a.title.toLowerCase();
       const titleB = b.title.toLowerCase();
@@ -60,6 +75,25 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
         return 1;
       }
       return 0;
+    }).forEach((child) => {
+      chrome.bookmarks.move(child.id, { parentId: child.parentId, index: 0 });
+    });
+    this.props.forceUpdateCallback();
+  }
+
+  sortFolderByUrl = () => {
+    this.props.treeNode.children?.sort((a, b) => {
+      const titleA = a.url?.toLowerCase();
+      const titleB = b.url?.toLowerCase();
+      if (titleA && titleB) {
+        if (titleA > titleB) {
+          return -1;
+        } else if (titleA < titleB) {
+          return 1;
+        }
+        return 0;
+      }
+      return titleA ? -1 : titleB ? 1 : 0;
     });
     this.props.treeNode.children?.forEach((child) => {
       chrome.bookmarks.move(child.id, { parentId: child.parentId, index: 0 });
@@ -67,16 +101,25 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
     this.props.forceUpdateCallback();
   }
 
+  showCreateModal = () => {
+    CreateService.parentId = this.props.treeNode.id;
+    this.props.setModalOpen(true);
+  }
+
   contextMenu = [
-    <button className="btn btn-outline-primary p-0 border-0 rounded-0 text-left w-100" onClick={this.sortFolder}>Sort AlphaNumerically</button>,
+    <button className="btn btn-outline-primary p-0 border-0 rounded-0 text-left w-100" onClick={this.showCreateModal}>Create New ...</button>,
     <button className={`btn ${this.isRootFolder ? 'btn-outline-secondary' : 'btn-outline-primary'} p-0 border-0 rounded-0  text-left w-100`}
       disabled={this.isRootFolder} onClick={this.editText}>Rename</button>,
     <button className={`btn ${this.isRootFolder ? 'btn-outline-secondary' : 'btn-outline-primary'} p-0 border-0 rounded-0  text-left w-100`}
-      disabled={this.isRootFolder} onClick={this.deleteFolder}>Delete</button>
+      disabled={this.isRootFolder} onClick={this.deleteFolder}>Delete</button>,
+    <button className="btn btn-outline-primary p-0 border-0 rounded-0 text-left w-100" onClick={this.sortFolderByTitle}>Sort by Title</button>,
+    <button className="btn btn-outline-primary p-0 border-0 rounded-0 text-left w-100" onClick={this.sortFolderByUrl}>Sort by Url</button>
   ];
   handleContextMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    this.props.setContextMenu(true, this.contentRef.getBoundingClientRect().top + this.contentRef.scrollHeight, this.contextMenu);
+    if (this.props.setContextMenu) {
+      this.props.setContextMenu(true, this.contentRef.getBoundingClientRect().top + this.contentRef.scrollHeight, this.contextMenu);
+    }
   }
   render() {
     return (
@@ -84,11 +127,11 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
         data-nodeId={this.props.treeNode.id}
         onContextMenu={this.handleContextMenu}
         key={this.props.treeNode.id}>
-        <Card className="bookmark-link-container">
-          <Dropzone onDropCallback={this.addLink} canDrop={!this.isRootFolder && this.props.canDrop} ></Dropzone>
-          <Card.Header className="p-0 bg-light">
-            <Accordion.Toggle onClick={() => { this.setState({ expanded: !this.state.expanded }) }} className="w-100 bg-dark text-white" as={Button} variant="link" eventKey="0">
-              <div className="p-3 w-100 d-flex align-items-center" >
+        <div className="bookmark-link-container">
+          <div className="p-0 bg-light">
+            <Accordion.Toggle onClick={() => { this.setState({ expanded: !this.state.expanded }) }} className="w-100 rounded-0 bg-dark text-white" as={Button} variant="link" eventKey="0">
+              <Dropzone onDropCallback={this.addLink} canDrop={!this.isRootFolder && this.props.canDrop} ></Dropzone>
+              <div className="p-2 w-100 d-flex align-items-center" >
                 <FontAwesomeIcon className="mr-3" icon={this.state.expanded ? faFolderOpen : faFolder}></FontAwesomeIcon>
                 <div
                   ref={(ref) => { if (ref) this.contentRef = ref; }} contentEditable={this.state.editable}
@@ -99,13 +142,13 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
                 </div>
               </div>
             </Accordion.Toggle>
-          </Card.Header>
+          </div>
           <Accordion.Collapse eventKey="0">
-            <Card.Body className="pl-1">
+            <div className="pl-1">
               {this.generateChildren()}
-            </Card.Body>
+            </div>
           </Accordion.Collapse>
-        </Card>
+        </div>
       </Accordion>
     );
   }
@@ -150,11 +193,9 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
     this.props.setCanDrop(true);
   }
 
-
-
   //recursively will generate levels of the tree, the base case being when the child is a LINK and thus has no children of its own.
   generateChildren(): JSX.Element {
-    if (this.props.treeNode.children) {
+    if (this.props.treeNode.children && this.props.treeNode.children.length) {
       return (<ReactSortable
         key={this.props.treeNode.id}
         animation={150}
@@ -176,6 +217,9 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
               forceUpdateCallback={this.props.forceUpdateCallback}
               setCanDrop={this.props.setCanDrop}
               setContextMenu={this.props.setContextMenu}
+              setModalOpen={this.props.setModalOpen}
+              addHistory={this.props.addHistory}
+              removeHistory={this.props.removeHistory}
               updateTree={this.props.updateTree}
               index={[...this.props.index, i]}
               key={item.id}
@@ -186,6 +230,8 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
             return <Link
               forceUpdateCallback={this.props.forceUpdateCallback}
               setContextMenu={this.props.setContextMenu}
+              addHistory={this.props.addHistory}
+              removeHistory={this.props.removeHistory}
               key={item.id}
               canDrop={this.props.canDrop}
               treeNode={item}>
@@ -194,7 +240,28 @@ class Folder extends NodeEntity<FolderProps, FolderState> {
         })}
       </ReactSortable>);
     }
-    return <div></div>;
+    return (
+      <div className="p-2">
+        <ReactSortable
+          key={this.props.treeNode.id}
+          animation={150}
+          list={[]}
+          setList={(newState) => {
+            this.props.updateTree(newState, this.props.index);
+          }}
+          group="links"
+          dragClass="drag"
+          id={this.props.treeNode.id}
+          onStart={() => { this.props.setCanDrop(false); }}
+          onEnd={(evt) => { this.moveLink(evt); }}
+        // multiDrag={true}
+        // selectedClass="chosen"
+        >
+        </ReactSortable>
+        <Dropzone onDropCallback={this.addChildLink} canDrop={this.props.canDrop} ></Dropzone>
+        <div className="text-center">- Empty -</div>
+      </div>
+    );
   }
 
 }

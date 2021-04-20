@@ -23,7 +23,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
         if (this.props.menuOpen) {
             return <div className="menu-container w-100" style={{ top: `${this.props.y}px`, left: 0 }}>
                 {this.props.children}
-                    <button onClick={this.closeMenu} className="btn btn-outline-primary p-0 border-0 rounded-0 text-left">Cancel</button>
+                    <button onClick={this.closeMenu} className="btn btn-outline-primary p-0 border-0 rounded-0 text-left w-100">Cancel</button>
             </div>;
         }
         return null;

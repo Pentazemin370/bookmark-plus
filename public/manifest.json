@@ -1,30 +1,57 @@
 {
-  "manifest_version": 2,
-
-  "name": "BookmarkPlus",
-  "description": "Take your bookmarks to the next level, and never forget anything you learned!",
+  "manifest_version": 3,
+  "name": "Bookmark+ Beta",
+  "description": "A modern, customizable, and feature rich bookmark sidebar",
   "version": "0.0.1",
-  "browser_action" : {
-    "default_icon" : "logo192.png"
+  "action": {
+    "default_icon": {
+      "16": "temp_logo.png",
+      "24": "temp_logo.png",
+      "32": "temp_logo.png"
+    }
+  },
+  "commands": {
+    "toggle-menu": {
+      "suggested_key": {
+        "default": "Ctrl+Space",
+        "mac": "Ctrl+Space"
+      },
+      "description": "Toggle Command"
+    }
   },
   "icons": {
-    "16": "logo192.png",
-    "48": "logo192.png",
-    "128": "logo192.png"
+    "16": "temp_logo.png",
+    "48": "temp_logo.png",
+    "128": "temp_logo.png"
   },
-  "content_scripts":[{
-    "matches":["<all_urls>"],
-    "js":["contentScript.js"],
-    "match_about_blank":true
-  }
-],
-  "web_accessible_resources": ["index.html"],
-  
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "match_about_blank": true
+    }
+  ],
   "background": {
-    "scripts":["runtimeHandler.js"],
-    "persistent":false
+    "service_worker": "sw.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "index.html",
+        "toggle-button.html",
+        "mouse.svg"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
   "permissions": [
-    "bookmarks","tabs","chrome://favicon/"
+    "bookmarks",
+    "history"
   ]
 }
