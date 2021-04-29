@@ -4,9 +4,8 @@ import App from './App';
 import './index.scss';
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <div>testy test</div>
   </React.StrictMode>,
-  document.getElementById('root'),
-  () => { console.log('rendered this child dad'); }
+  document.getElementById('root')
 );
 
