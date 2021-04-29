@@ -19,6 +19,9 @@
       "description": "Toggle Command"
     }
   },
+  "chrome_url_overrides": {
+    "newtab": "landing.html"
+  },
   "icons": {
     "16": "temp_logo.png",
     "48": "temp_logo.png",
@@ -42,6 +45,7 @@
     {
       "resources": [
         "index.html",
+        "landing.html",
         "toggle-button.html",
         "mouse.svg"
       ],

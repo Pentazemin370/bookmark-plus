@@ -20,5 +20,3 @@ export function sortByProperty<T>(ref: any[], property?: string, ascending = tru
         return (s ? 1 : t ? -1 : 0) * mod;
     }) as T[];
 }
-
-
