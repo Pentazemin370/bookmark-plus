@@ -19,6 +19,14 @@
       "description": "Toggle Command"
     }
   },
+  "chrome_url_overrides": {
+    "newtab": "landing.html"
+  },
+  "icons": {
+    "16": "temp_logo.png",
+    "48": "temp_logo.png",
+    "128": "temp_logo.png"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -48,9 +56,6 @@
   ],
   "permissions": [
     "bookmarks",
-    "history",
-    "storage",
-    "tabs",
-    "activeTab"
+    "history"
   ]
 }
