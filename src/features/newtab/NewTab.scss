@@ -1,0 +1,45 @@
+@import "~bootstrap/dist/css/bootstrap.min.css";
+.bg-image {
+    filter: contrast(40%);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
+}
+.fg-filter {
+    backdrop-filter: blur(10px);
+    border-radius: 4px;
+}
+.trim-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
+}
+.dashboard-link {
+    width: 100px;
+    height: 100px;
+}
+
+.content-row {
+    max-height: 200px;
+    overflow: hidden;
+}
+.dashboard-icon {
+    width: 50px;
+    flex-shrink: 0;
+}
+.right-0 {
+    right: 0;
+}
+.bg-transparent-black {
+    background-color: rgba(1, 1, 1, 0.5);
+}
+.modal-dialog {
+    max-width: 750px;
+}
+
+.modal-button {
+    width: 150px;
+}
