@@ -45,7 +45,7 @@ export function History(props: { savedList: Set<string>, removeHistory: (url: st
 
     useEffect(() => {
         getHistoryList();
-    }, []);
+    });
 
     const getButton = (item: chrome.history.HistoryItem) => {
         if (item.url && props.savedList.has(item.url)) {
@@ -61,7 +61,7 @@ export function History(props: { savedList: Set<string>, removeHistory: (url: st
                 <hr className="m-0" />
                 {historyList.map(historyItem =>
                     <div className="d-flex">
-                        <Link treeNode={historyItem} canDrop={false} forceUpdateCallback={() => { }} />
+                        <Link treeNode={historyItem} isBookmark={false} forceUpdateCallback={() => { }} />
                         {getButton(historyItem)}
                     </div>
                 )

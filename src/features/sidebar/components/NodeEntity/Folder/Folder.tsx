@@ -11,7 +11,7 @@ import { Link } from '../Link/Link';
 import { CreateService } from '../../../../../services/CreateService';
 import Dropzone from '../../Dropzone/Dropzone';
 import { sortByProperty } from '../../../../../util/common-util';
-import { setCanDrop } from '../../../store';
+import { setCanDrop, setContextMenu } from '../../../store';
 import { useDispatch } from 'react-redux';
 import { BOOKMARKS_BAR_ID, OTHER_BOOKMARKS_ID } from '../../../constants/app-constants';
 
@@ -108,9 +108,7 @@ const Folder = (props: FolderProps) => {
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (props.setContextMenu) {
-      props.setContextMenu(true, contentRef.getBoundingClientRect().top + contentRef.scrollHeight, contextMenu);
-    }
+    dispatch(setContextMenu({ open: true, y: contentRef.getBoundingClientRect().top + contentRef.scrollHeight, menuOptions: contextMenu }));
   }
 
   const addLink = (event: React.DragEvent) => {
@@ -118,7 +116,7 @@ const Folder = (props: FolderProps) => {
     event.stopPropagation();
     const url = event.dataTransfer.getData('URL');
     const treeNode = props.treeNode as chrome.bookmarks.BookmarkTreeNode;
-    if (url && treeNode.parentId && treeNode.index) {
+    if (url && treeNode.parentId && treeNode.index != null) {
       chrome.bookmarks.create({
         url: url,
         title: url,
@@ -141,7 +139,7 @@ const Folder = (props: FolderProps) => {
     if (id && parentId) {
       chrome.bookmarks.move(id, { parentId: parentId, index: newIndex });
     }
-    props.setCanDrop(true);
+    dispatch(setCanDrop(true));
   }
   //recursively will generate levels of the tree, the base case being when the child is a LINK and thus has no children of its own.
   const generateChildren = () => {
@@ -156,7 +154,7 @@ const Folder = (props: FolderProps) => {
         group="links"
         dragClass="drag"
         id={props.treeNode.id}
-        onStart={() => { props.setCanDrop(false); }}
+        onStart={() => { dispatch(setCanDrop(false)); }}
         onEnd={(evt) => { moveLink(evt); }}
       // multiDrag={true}
       // selectedClass="chosen"
@@ -165,25 +163,20 @@ const Folder = (props: FolderProps) => {
           if (item.children) {
             return <Folder
               forceUpdateCallback={props.forceUpdateCallback}
-              setCanDrop={props.setCanDrop}
-              setContextMenu={props.setContextMenu}
               setModalOpen={props.setModalOpen}
               addHistory={props.addHistory}
               removeHistory={props.removeHistory}
               index={[...props.index, i]}
               key={item.id}
-              canDrop={props.canDrop}
-              rootId={props.rootId}
               updateTree={props.updateTree}
               treeNode={item} />
           } else {
             return <Link
               forceUpdateCallback={props.forceUpdateCallback}
-              setContextMenu={props.setContextMenu}
               addHistory={props.addHistory}
               removeHistory={props.removeHistory}
               key={item.id}
-              canDrop={props.canDrop}
+              isBookmark={true}
               treeNode={item} />
           }
         })}
@@ -201,13 +194,13 @@ const Folder = (props: FolderProps) => {
           group="links"
           dragClass="drag"
           id={props.treeNode.id}
-          onStart={() => { props.setCanDrop(false); }}
+          onStart={() => { dispatch(setCanDrop(false)); }}
           onEnd={(evt) => { moveLink(evt); }}
         // multiDrag={true}
         // selectedClass="chosen"
         >
         </ReactSortable>
-        <Dropzone onDropCallback={addChildLink} canDrop={props.canDrop} />
+        <Dropzone onDropCallback={addChildLink} />
         <div className="text-center">- Empty -</div>
       </div>
     );
@@ -221,7 +214,7 @@ const Folder = (props: FolderProps) => {
       <div className="bookmark-link-container">
         <div className="p-0 bg-light">
           <Accordion.Toggle onClick={() => setExpanded(!expanded)} className="w-100 rounded-0 bg-dark text-white" as={Button} variant="link" eventKey="0">
-            <Dropzone onDropCallback={addLink} canDrop={!isRootFolder && props.canDrop} ></Dropzone>
+            <Dropzone onDropCallback={addLink} disabled={isRootFolder} ></Dropzone>
             <div className="p-2 w-100 d-flex align-items-center" >
               <FontAwesomeIcon className="mr-3" icon={expanded ? faFolderOpen : faFolder}></FontAwesomeIcon>
               <div
