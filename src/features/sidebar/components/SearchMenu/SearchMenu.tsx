@@ -78,7 +78,8 @@ export const SearchMenu = (props: SearchMenuProps) => {
         <div className="d-flex flex-column align-items-center">
             <div className="results-container">
                 {resultList.map(result => <Link
-                    isBookmark={false}
+                    canDrop={false}
+                    setContextMenu={props.setContextMenu}
                     treeNode={result}
                     forceUpdateCallback={props.forceUpdateCallback} />)
                     .slice((page - 1) * 20, page * 20)}

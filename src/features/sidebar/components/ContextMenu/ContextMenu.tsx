@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { setContextMenu } from '../../store';
 import { ContextMenuProps } from './ContextMenu.props';
 
 import './ContextMenu.scss';
 
 export const ContextMenu = (props: ContextMenuProps) => {
-    const dispatch = useDispatch();
-    const closeMenu = () => { dispatch(setContextMenu({ open: false })); }
+
+    const closeMenu = () => { props.setContextMenu(false); }
 
     const openMenu = (e: MouseEvent) => {
         e.preventDefault();
