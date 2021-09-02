@@ -1,4 +1,4 @@
 export interface DropzoneProps {
-    disabled?: boolean;
-    onDropCallback: (e: React.DragEvent) => any;
+    canDrop : boolean;
+    onDropCallback : (e : React.DragEvent) => any;
 }
