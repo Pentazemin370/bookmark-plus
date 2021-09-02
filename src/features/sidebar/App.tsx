@@ -18,10 +18,10 @@ export const App = () => {
   const [historyList, setHistoryList] = useState<Set<string>>(new Set());
   const [bookmarkBarNode, setBookmarkBarNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
   const [otherBookmarksNode, setOtherBookmarksNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
-  const [canDrop, setCanDrop] = useState(true);
-  const [contextMenu, setContextMenu] = useState<{ open: boolean, y: number, menuOptions: JSX.Element[] }>({ open: false, y: 0, menuOptions: [] });
 
   const setModalOpen = (showModal: boolean) => setShowModal(showModal);
+
+  const { contextMenu } = useSelector<RootState, AppState>(state => state);
 
   const addHistory = (url: string) => {
     const tempList = historyList;
@@ -81,14 +81,6 @@ export const App = () => {
       }
     }
   }
-  //inform the app that a drag is happening from within the bookmark bar, so no duplicate links are created on drop
-  const updateCanDrop = (value: boolean) => {
-    setCanDrop(value);
-  }
-
-  const updateContextMenu = (open: boolean, y?: number, menuOptions?: JSX.Element[]) => {
-    setContextMenu({ open: open, y: y ? y : 0, menuOptions: menuOptions ? menuOptions : contextMenu.menuOptions });
-  };
 
   const folderView = () => {
     if (bookmarkBarNode && otherBookmarksNode) {
@@ -97,26 +89,18 @@ export const App = () => {
           index={[0]}
           forceUpdateCallback={setBookmarkState}
           updateTree={updateBookmarkBarTree}
-          setCanDrop={updateCanDrop}
-          setContextMenu={updateContextMenu}
           setModalOpen={setModalOpen}
           addHistory={addHistory}
           removeHistory={removeHistory}
-          canDrop={canDrop}
-          rootId={BOOKMARKS_BAR_ID}
           treeNode={bookmarkBarNode[0]} />
         ,
         <Folder
           index={[0]}
           forceUpdateCallback={setBookmarkState}
           updateTree={updateOtherBookmarksTree}
-          setCanDrop={updateCanDrop}
-          setContextMenu={updateContextMenu}
           setModalOpen={setModalOpen}
           addHistory={addHistory}
           removeHistory={removeHistory}
-          canDrop={canDrop}
-          rootId={OTHER_BOOKMARKS_ID}
           treeNode={otherBookmarksNode[0]} />
       ];
     }
@@ -129,8 +113,7 @@ export const App = () => {
         forceUpdateCallback={setBookmarkState}
         setModalOpen={setModalOpen} />
       <ContextMenu menuOpen={contextMenu.open}
-        y={contextMenu.y}
-        setContextMenu={updateContextMenu}>
+        y={contextMenu.y}>
         {contextMenu.menuOptions}
       </ContextMenu>
       <Tabs defaultActiveKey="folders" activeKey={activeTab} onSelect={(key: string) => setActiveTab(key)} id="main-tabs">
@@ -138,10 +121,7 @@ export const App = () => {
           {folderView()}
         </Tab>
         <Tab eventKey="search" title={'Search'}>
-          <SearchMenu
-            forceUpdateCallback={setBookmarkState}
-            setContextMenu={updateContextMenu} />
-
+          <SearchMenu forceUpdateCallback={setBookmarkState} />
         </Tab>
         <Tab eventKey="history" title={'History'}>
           <History savedList={historyList} removeHistory={removeHistory} updateCallback={setBookmarkState} />

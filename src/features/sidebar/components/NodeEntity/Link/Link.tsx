@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setContextMenu } from "../../../store";
 import Dropzone from "../../Dropzone/Dropzone";
 import { LinkProps } from "./Link.props";
 import './Link.scss';
@@ -7,6 +9,7 @@ export const Link = (props: LinkProps) => {
 
     let anchorRef!: HTMLElement;
 
+    const dispatch = useDispatch();
     const [editable, setEditable] = useState(false);
 
     const editText = () => {
@@ -41,7 +44,7 @@ export const Link = (props: LinkProps) => {
         event.stopPropagation();
         const url = event.dataTransfer.getData('URL');
         const treeNode = props.treeNode as chrome.bookmarks.BookmarkTreeNode;
-        if (url && treeNode.parentId && treeNode.index) {
+        if (url && treeNode.parentId && treeNode.index != null) {
             chrome.bookmarks.create({
                 url: url,
                 title: url,
@@ -64,11 +67,9 @@ export const Link = (props: LinkProps) => {
         setEditable(false);
     }
 
-    const setContextMenu = (e: React.MouseEvent) => {
+    const handleContextMenu = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (props.setContextMenu) {
-            props.setContextMenu(true, anchorRef.getBoundingClientRect().top + anchorRef.scrollHeight, linkContextMenu);
-        }
+        dispatch(setContextMenu({ open: true, y: anchorRef.getBoundingClientRect().top + anchorRef.scrollHeight, menuOptions: linkContextMenu }));
     }
 
     useEffect(() => {
@@ -81,9 +82,9 @@ export const Link = (props: LinkProps) => {
 
     return <button
         onClick={() => followLink()}
-        onContextMenu={setContextMenu}
+        onContextMenu={handleContextMenu}
         className="w-100 btn btn-light rounded-0 border-0" data-nodeId={props.treeNode.id} key={props.treeNode.id}>
-        <Dropzone onDropCallback={addLink} canDrop={props.canDrop} />
+        <Dropzone onDropCallback={addLink} />
         <div className="p-2 d-flex align-items-center" >
             <span className="pr-2 icon-button-container" >
                 <img src={`https://www.google.com/s2/favicons?domain=${props.treeNode.url}`} />
