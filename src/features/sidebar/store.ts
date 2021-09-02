@@ -8,21 +8,24 @@ export interface BookmarkTreeState {
 
 export interface AppState {
     canDrop: boolean;
+    contextMenu: { open: boolean, y?: number, menuOptions?: JSX.Element[] };
 }
 
 const appInitialState = {
-    canDrop: true
+    canDrop: true,
+    contextMenu: { open: false }
 }
 
 export const appSlice = createSlice({
     name: "app",
     initialState: appInitialState,
     reducers: {
-        setCanDrop: (state, action) => { state.canDrop = action.payload; }
+        setCanDrop: (state, action) => { state.canDrop = action.payload; },
+        setContextMenu: (state, action) => { Object.assign(state.contextMenu, action.payload); }
     }
 })
 
 export const store = createStore(appSlice.reducer);
 export type RootState = ReturnType<typeof store.getState>;
-export const { setCanDrop } = appSlice.actions;
+export const { setCanDrop, setContextMenu } = appSlice.actions;
 export default store;
