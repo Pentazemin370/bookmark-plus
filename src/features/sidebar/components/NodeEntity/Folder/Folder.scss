@@ -28,12 +28,41 @@
     }
 }
 
+.test {
+    display: none;
+    background-color: white;
+    position: relative;
+    &.active {
+        display: block;
+        min-height: 40px;
+        border: 2px dashed #0275d8;
+    }
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.opacity-100 {
+    opacity: 100;
+}
+
+.accordion {
+    padding-left: 1em;
+    overflow: hidden;
+    transition: all 0.2s ease-out;
+}
+
 .drag {
-    opacity:1;
-    width:100%;
+    opacity: 0;
+    width: 100%;
     cursor: grabbing;
 }
 
 .chosen {
-    background-color:aqua;
+    background-color: aqua;
+}
+.original-placeholder {
+    border: 3px solid pink;
+    display: block;
 }

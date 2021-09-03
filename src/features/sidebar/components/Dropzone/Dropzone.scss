@@ -1,14 +1,20 @@
 .dropzone {
-    position:relative;
-    margin-bottom:-40px;
-    z-index:1;
-    height:40px;
+    position: relative;
+    left: 0;
+    right: 0;
+    margin-bottom: -40px;
+    z-index: 1;
+    height: 40px;
     &:last-child {
-        margin-bottom:0px;
+        margin-bottom: 0px;
     }
     &.active {
-        margin-bottom:0px;
-        background-color:white;
+        margin-bottom: 0px;
+        background-color: white;
         border: 2px dashed gray;
     }
+    // &.disable {
+    //     position: fixed;
+    //     z-index: -1;
+    // }
 }

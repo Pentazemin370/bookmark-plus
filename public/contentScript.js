@@ -8,9 +8,16 @@ style.innerHTML = `
         z-index:999999;
         top:0;
         background-color:transparent;
-        transition: all 0.2s;
+        transition: all 0.2s ease-out;
     }
 iframe {
+        width:100%;
+        height:100%;
+        border-radius: 4px;
+        border:1px solid gray;
+        z-index:1;
+}
+.frame {
         width:100%;
         height:100%;
         border-radius: 4px;
@@ -50,10 +57,18 @@ buttonContainer.classList = ['bookmark-toggle-container'];
 
 const container = document.createElement('div');
 container.id = "bookmark-container";
+container.style.left = "-400px";
 
 const toggleButton = document.createElement('button');
 toggleButton.classList = ['bookmark-toggle-button'];
-
+toggleButton.onclick = () => {
+        container.style.left = container.style.left === "-400px" ? "0px" : "-400px";
+        if (toggleButton.classList.contains('active')) {
+                toggleButton.classList.remove('active');
+        } else {
+                toggleButton.classList.add(['active']);
+        }
+};
 buttonContainer.appendChild(toggleButton);
 
 const toggleImg = document.createElement('img');
@@ -108,16 +123,20 @@ const updateDirection = (dir) => {
                 }
         }
 }
+if (chrome.storage) {
+        console.log('storage found');
+        chrome.storage.local.get('barOrientation', (res) => {
+                console.log(res.barOrientation);
+                updateDirection(res.barOrientation);
+        });
 
-chrome.storage.local.get('barOrientation', (res) => {
-        updateDirection(res.barOrientation);
-});
+        chrome.storage.onChanged.addListener((changes) => {
+                if (changes.barOrientation) {
+                        updateDirection(changes.barOrientation.newValue);
+                }
+        });
+}
 
-chrome.storage.onChanged.addListener((changes) => {
-        if (changes.barOrientation) {
-                updateDirection(changes.barOrientation.newValue);
-        }
-});
 
 
 

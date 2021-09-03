@@ -5,22 +5,26 @@ import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FolderProps } from './Folder.props';
 import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { ReactSortable, Sortable } from 'react-sortablejs';
 import { Link } from '../Link/Link';
 import { CreateService } from '../../../../../services/CreateService';
 import Dropzone from '../../Dropzone/Dropzone';
 import { sortByProperty } from '../../../../../util/common-util';
-import { setCanDrop, setContextMenu } from '../../../store';
-import { useDispatch } from 'react-redux';
+import { AppState, RootState, setCanDrop, setContextMenu } from '../../../store';
+import { useDispatch, useSelector } from 'react-redux';
 import { BOOKMARKS_BAR_ID, OTHER_BOOKMARKS_ID } from '../../../constants/app-constants';
-
 
 
 const Folder = (props: FolderProps) => {
   const dispatch = useDispatch();
   const [editable, setEditable] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [coordinates, setCoordinates] = useState([0, 0]);
+  const [dragging, setDragging] = useState(false);
+  const { canDrop } = useSelector<RootState, AppState>(state => state);
+
 
   let isRootFolder = (props.treeNode.id === BOOKMARKS_BAR_ID || props.treeNode.id === OTHER_BOOKMARKS_ID);
 
@@ -152,10 +156,18 @@ const Folder = (props: FolderProps) => {
           props.updateTree(newState, props.index);
         }}
         group="links"
-        dragClass="drag"
+        chosenClass="chosen"
+        // dragClass="drag"
+        filter=".filter"
         id={props.treeNode.id}
-        onStart={() => { dispatch(setCanDrop(false)); }}
+        onStart={(e) => {
+          dispatch(setCanDrop(false));
+        }}
         onEnd={(evt) => { moveLink(evt); }}
+        fallbackOnBody={true}
+        // swapThreshold={0.85}
+        invertSwap={true}
+        removeCloneOnHide={false}
       // multiDrag={true}
       // selectedClass="chosen"
       >
@@ -186,34 +198,35 @@ const Folder = (props: FolderProps) => {
       <div className="p-2">
         <ReactSortable
           key={props.treeNode.id}
-          animation={150}
+          animation={0}
           list={[]}
           setList={(newState) => {
             props.updateTree(newState, props.index);
           }}
           group="links"
           dragClass="drag"
+          className={`test ${canDrop ? '' : 'active'}`}
+          filter=".filter"
           id={props.treeNode.id}
-          onStart={() => { dispatch(setCanDrop(false)); }}
+          onChoose={() => { dispatch(setCanDrop(false)); }}
           onEnd={(evt) => { moveLink(evt); }}
         // multiDrag={true}
         // selectedClass="chosen"
         >
         </ReactSortable>
-        <Dropzone onDropCallback={addChildLink} />
-        <div className="text-center">- Empty -</div>
+        {canDrop ? <Dropzone alwaysActive={true} onDropCallback={addChildLink} /> : null}
       </div>
     );
   }
 
-  return (
-    <Accordion
-      data-nodeId={props.treeNode.id}
+  function expensiveRender() {
+    return <Accordion
       onContextMenu={handleContextMenu}
+      data-nodeId={props.treeNode.id}
       key={props.treeNode.id}>
-      <div className="bookmark-link-container">
-        <div className="p-0 bg-light">
-          <Accordion.Toggle onClick={() => setExpanded(!expanded)} className="w-100 rounded-0 bg-dark text-white" as={Button} variant="link" eventKey="0">
+      <Card className="bookmark-link-container">
+        <Card.Header className="p-0 bg-light">
+          <Accordion.Toggle onClick={() => setExpanded(!expanded)} className="w-100 rounded-0 bg-dark text-white" as={Button} eventKey={props.treeNode.id}>
             <Dropzone onDropCallback={addLink} disabled={isRootFolder} ></Dropzone>
             <div className="p-2 w-100 d-flex align-items-center" >
               <FontAwesomeIcon className="mr-3" icon={expanded ? faFolderOpen : faFolder}></FontAwesomeIcon>
@@ -226,15 +239,45 @@ const Folder = (props: FolderProps) => {
               </div>
             </div>
           </Accordion.Toggle>
-        </div>
-        <Accordion.Collapse eventKey="0">
-          <div className="pl-1">
+        </Card.Header>
+        <Accordion.Collapse eventKey={props.treeNode.id}>
+          <Card.Body>
             {generateChildren()}
-          </div>
+          </Card.Body>
         </Accordion.Collapse>
+      </Card>
+    </Accordion>;
+  }
+
+  function cheapRender() {
+    return <div
+      className={`bookmark-link-container`} data-nodeId={props.treeNode.id} onContextMenu={handleContextMenu}>
+      <div className="p-0 bg-light w-100 rounded-0 bg-dark text-white" onClick={() => setExpanded(!expanded)}>
+        <Dropzone onDropCallback={addLink} disabled={isRootFolder} ></Dropzone>
+        <div className="p-2 w-100 d-flex align-items-center" >
+          <FontAwesomeIcon className="mr-3" icon={expanded ? faFolderOpen : faFolder}></FontAwesomeIcon>
+          <div
+            ref={(ref) => { if (ref) contentRef = ref; }} contentEditable={editable}
+            tabIndex={0}
+            onKeyPress={(event) => { if (event.key === "Enter") { contentRef.blur(); } }}
+            onBlur={handleBlur}
+          >{props.treeNode.title}
+          </div>
+        </div>
       </div>
-    </Accordion>
+      <div className={`accordion ${expanded ? 'opacity-100' : 'opacity-0'}`}
+      >
+        {expanded ? generateChildren() : null}
+      </div>
+    </div>;
+  }
+
+
+  return (
+    cheapRender()
   );
+
+
 
   //React Sortable multi-nested sorts not yet supported :(
 

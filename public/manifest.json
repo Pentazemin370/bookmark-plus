@@ -36,6 +36,7 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "https://www.google.com",
         "index.html",
         "landing.html",
         "toggle-button.html",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import './App.scss';
 import Folder from './components/NodeEntity/Folder/Folder';
 import 'bootstrap/dist/js/bootstrap.min';
@@ -12,16 +12,35 @@ import { AppState, RootState } from './store';
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { BOOKMARKS_BAR_ID, OTHER_BOOKMARKS_ID } from './constants/app-constants';
 
+// export const OtherBookmarksDispatch = React.createContext(null);
+// const reducer = (state, action) => {
+//   if (action.currentList && action.indices) {
+//     if (state) {
+//       let temp = [...state];
+//       const _indices = [...action.indices];
+//       const firstIndex = _indices.pop();
+//       if (firstIndex !== undefined) {
+//         const arr = _indices.reduce((a, i) => a[i].children as any, temp);
+//         if (arr[firstIndex]) {
+//           arr[firstIndex].children = action.currentList;
+//         }
+//         return temp;
+//       }
+//     } else {
+//       return action;
+//     }
+//   }
+// }
+
 export const App = () => {
   const [activeTab, setActiveTab] = useState('folders');
   const [showModal, setShowModal] = useState(false);
   const [historyList, setHistoryList] = useState<Set<string>>(new Set());
   const [bookmarkBarNode, setBookmarkBarNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
   const [otherBookmarksNode, setOtherBookmarksNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
-
   const setModalOpen = (showModal: boolean) => setShowModal(showModal);
 
-  const { contextMenu } = useSelector<RootState, AppState>(state => state);
+  const { contextMenu } = useSelector<RootState, AppState>(state => state, shallowEqual);
 
   const addHistory = (url: string) => {
     const tempList = historyList;
@@ -44,6 +63,7 @@ export const App = () => {
   }
 
   useEffect(() => {
+    console.log('i actually run more than once');
     window.addEventListener('message', (e: any) => {
       if (e.data && ['history', 'folders', 'search', 'settings'].includes(e.data)) {
         setActiveTab(e.data);
@@ -53,6 +73,7 @@ export const App = () => {
   }, []);
 
   const updateBookmarkBarTree = (currentList: any, indices: number[]) => {
+
     if (bookmarkBarNode) {
       let temp = [...bookmarkBarNode];
       const _indices = [...indices];
