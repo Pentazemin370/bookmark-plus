@@ -36,6 +36,7 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
 
 const isExtendingEslintConfig = process.env.EXTEND_ESLINT === 'true';
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const imageInlineSizeLimit = parseInt(
   process.env.IMAGE_INLINE_SIZE_LIMIT || '10000'
@@ -508,6 +509,7 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      new BundleAnalyzerPlugin(),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(

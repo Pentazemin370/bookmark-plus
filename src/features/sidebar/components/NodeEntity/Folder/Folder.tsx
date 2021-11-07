@@ -252,7 +252,8 @@ const Folder = (props: FolderProps) => {
   function cheapRender() {
     return <div
       className={`bookmark-link-container`} data-nodeId={props.treeNode.id} onContextMenu={handleContextMenu}>
-      <div className="p-0 bg-light w-100 rounded-0 bg-dark text-white" onClick={() => setExpanded(!expanded)}>
+      <div className="p-0 bg-light w-100 rounded-0 bg-dark text-white"
+        onClick={() => setExpanded(!expanded)}>
         <Dropzone onDropCallback={addLink} disabled={isRootFolder} ></Dropzone>
         <div className="p-2 w-100 d-flex align-items-center" >
           <FontAwesomeIcon className="mr-3" icon={expanded ? faFolderOpen : faFolder}></FontAwesomeIcon>

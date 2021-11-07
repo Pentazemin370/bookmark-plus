@@ -11,6 +11,7 @@ import { Settings } from './components/Settings/Settings';
 import { AppState, RootState } from './store';
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { BOOKMARKS_BAR_ID, OTHER_BOOKMARKS_ID } from './constants/app-constants';
+import { Folder2 } from './components/NodeEntity/Folder2/Folder2';
 
 // export const OtherBookmarksDispatch = React.createContext(null);
 // const reducer = (state, action) => {
@@ -38,9 +39,12 @@ export const App = () => {
   const [historyList, setHistoryList] = useState<Set<string>>(new Set());
   const [bookmarkBarNode, setBookmarkBarNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
   const [otherBookmarksNode, setOtherBookmarksNode] = useState<chrome.bookmarks.BookmarkTreeNode[]>();
+  const [folder, setFolder] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
+
   const setModalOpen = (showModal: boolean) => setShowModal(showModal);
 
   const { contextMenu } = useSelector<RootState, AppState>(state => state, shallowEqual);
+
 
   const addHistory = (url: string) => {
     const tempList = historyList;
@@ -59,11 +63,11 @@ export const App = () => {
     });
     chrome.bookmarks.getSubTree(OTHER_BOOKMARKS_ID, (node) => {
       setOtherBookmarksNode(node);
+      setFolder([node[0]]);
     });
   }
 
   useEffect(() => {
-    console.log('i actually run more than once');
     window.addEventListener('message', (e: any) => {
       if (e.data && ['history', 'folders', 'search', 'settings'].includes(e.data)) {
         setActiveTab(e.data);
@@ -139,10 +143,9 @@ export const App = () => {
       </ContextMenu>
       <Tabs defaultActiveKey="folders" activeKey={activeTab} onSelect={(key: string) => setActiveTab(key)} id="main-tabs">
         <Tab eventKey="folders" title={'Folders'}>
-          {folderView()}
-        </Tab>
-        <Tab eventKey="search" title={'Search'}>
           <SearchMenu forceUpdateCallback={setBookmarkState} />
+          {folderView()}
+          <Folder2 folder={folder} setFolder={setFolder} />
         </Tab>
         <Tab eventKey="history" title={'History'}>
           <History savedList={historyList} removeHistory={removeHistory} updateCallback={setBookmarkState} />
